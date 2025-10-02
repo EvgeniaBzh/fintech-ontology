@@ -16,6 +16,12 @@ is_a(dispute, financial_entity).
 is_a(currency, financial_entity).
 is_a(security_feature, financial_entity).
 is_a(routing, financial_entity).
+is_a(api_request, financial_entity).
+is_a(api_key, security_feature).
+is_a(gateway, processor).
+is_a(fraud_system, processor).
+is_a(invoice, financial_entity).
+is_a(dispute_reason, dispute).
 
 % Рівень 2 -> 3 (Payment гілка)
 is_a(order, payment).
