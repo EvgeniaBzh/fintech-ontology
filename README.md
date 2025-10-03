@@ -1,18 +1,20 @@
+# онтологія фінтех системи
+
 предметна область: платіжні системи та фінтехнології
 
 ## опис проєкту
 
 онтологія описує предметну область платіжних систем та фінтехнологій. база знань містить класифікацію платіжних методів, типів транзакцій, учасників процесу та їх взаємозв'язків.
 
-система дозволяє робити автоматичні запити для аналізу зв'язків між об'єктами, пошуку залежностей та перевірки бізнес-правил.
+система дозволяє робити автоматичні запити для аналізу зв'язків між об'єктами, пошуку залежностей, перевірки бізнес-правил та збору статистики.
 
 ## виконання вимог
 
 вимоги до лабораторної роботи:
-- **класів**: 35+ (вимога: 20+)
-- **відношень**: 5 (вимога: 3+, включаючи is_a та part_of)
-- **рівнів ієрархії**: 5 (вимога: 4)
-- **інстансів на практичний клас**: 2+ для кожного
+- **класів**: 44
+- **відношень**: 5
+- **рівнів ієрархії**: 5
+- **інстансів на практичний клас**: 2+ для кожного 
 
 реалізовані відношення:
 1. `is_a` - таксономія/класифікація
@@ -25,13 +27,12 @@
 
 ### загальна кількість елементів
 
-- класів: 35+
+- класів: 44
 - відношень: 5
 - інстансів: 28
 - практичних класів з реалізаціями: 14
 
 ### основні гілки класифікації
-
 financial_entity (корінь)
 ├── payment
 ├── payment_method
@@ -44,313 +45,229 @@ financial_entity (корінь)
 ├── api_request
 └── invoice
 
-
 ## відношення
 
 ### 1. is_a (таксономія)
 
-визначає ієрархію "є типом", наприклад:
-- visa_card is_a branded_card
-- branded_card is_a card
-- card is_a payment_method
+визначає ієрархію "є типом". транзитивне замикання дозволяє перевіряти непрямі зв'язки через декілька рівнів.
 
-транзитивне замикання: `is_a_transitive(X, Y)` дозволяє перевіряти непрямі зв'язки
+приклад: visa_card → branded_card → card → payment_method → financial_entity
 
 ### 2. part_of (композиція)
 
-визначає відношення "є частиною", наприклад:
-- card_number part_of card_data
-- card_data part_of card
+визначає відношення "є частиною". підтримує транзитивні запити для пошуку всіх компонентів на будь-якій глибині.
 
-транзитивне замикання: `part_of_transitive(X, Y)`
+приклад: card_number → card_data → card
 
 ### 3. requires (залежності)
 
-описує необхідні залежності для виконання операцій:
-- authorization requires card_data
-- settle requires authorization
-- refund requires settle
+описує необхідні залежності для виконання операцій. дозволяє валідувати бізнес-процеси та перевіряти коректність послідовностей.
+
+приклад: refund → settle → authorization
 
 ### 4. processes (обробка)
 
-показує хто обробляє що:
-- processor processes payment
-- merchant processes order
-- gateway processes api_request
+показує хто обробляє що в системі.
+
+приклади:
+- processor обробляє payment
+- merchant обробляє order
+- gateway обробляє api_request
 
 ### 5. belongs_to (приналежність)
 
-визначає власність:
-- card belongs_to customer
-- order belongs_to merchant
-- transaction belongs_to order
+визначає власність та приналежність об'єктів.
+
+приклади:
+- card належить customer
+- transaction належить order
 
 ## ієрархія класів
 
 ### payment гілка (5 рівнів)
-
 financial_entity (1)
-  └── payment (2)
-      └── order (3)
-          └── transaction (4)
-              ├── authorization (5)
-              ├── settle (5)
-              ├── refund (5)
-              └── void (5)
+└── payment (2)
+└── order (3)
+└── transaction (4)
+├── authorization (5)
+├── settle (5)
+├── refund (5)
+└── void (5)
 
 ### payment_method гілка (5 рівнів)
-
 financial_entity (1)
-  └── payment_method (2)
-      ├── card (3)
-      │   └── branded_card (4)
-      │       ├── visa_card (5)
-      │       ├── mastercard_card (5)
-      │       └── amex_card (5)
-      │
-      ├── alternative_payment_method (3)
-      │   └── regional_apm (4)
-      │       ├── pix (5)
-      │       ├── upi (5)
-      │       └── ideal (5)
-      │
-      └── digital_wallet (3)
-          └── mobile_wallet (4)
-              ├── apple_pay (5)
-              └── google_pay (5)
+└── payment_method (2)
+├── card (3)
+│   └── branded_card (4)
+│       ├── visa_card (5)
+│       ├── mastercard_card (5)
+│       └── amex_card (5)
+│
+├── alternative_payment_method (3)
+│   └── regional_apm (4)
+│       ├── pix (5)
+│       ├── upi (5)
+│       └── ideal (5)
+│
+└── digital_wallet (3)
+        └── mobile_wallet (4)
+            ├── apple_pay (5)
+            └── google_pay (5)
 
 ### actor гілка (4 рівні)
-
 financial_entity (1)
-  └── actor (2)
-      ├── merchant (3)
-      │   ├── ecommerce_merchant (4)
-      │   └── retail_merchant (4)
-      │
-      ├── customer (3)
-      │   ├── individual_customer (4)
-      │   └── business_customer (4)
-      │
-      └── processor (3)
+└── actor (2)
+├── merchant (3)
+│   ├── ecommerce_merchant (4)
+│   └── retail_merchant (4)
+│
+├── customer (3)
+│   ├── individual_customer (4)
+│   └── business_customer (4)
+│
+└── processor (3)
 
 ## інстанси
 
 всі практичні класи мають мінімум 2 реалізації з реальними властивостями.
 
 ### картки (6 інстансів)
-
-visa_card: visa_card_4111, visa_card_4532
-mastercard_card: mastercard_5555, mastercard_5105
-amex_card: amex_3782, amex_3714
+- visa_card: 2 екземпляри
+- mastercard_card: 2 екземпляри
+- amex_card: 2 екземпляри (включаючи заблоковану картку)
 
 ### регіональні платіжні методи (6 інстансів)
-
-pix (бразилія): pix_br_001, pix_br_002
-upi (індія): upi_in_001, upi_in_002
-ideal (нідерланди): ideal_nl_001, ideal_nl_002
+- pix (бразилія): 2 екземпляри
+- upi (індія): 2 екземпляри
+- ideal (нідерланди): 2 екземпляри
 
 ### мобільні гаманці (4 інстанси)
-
-apple_pay: apple_pay_001, apple_pay_002
-google_pay: google_pay_001, google_pay_002
+- apple_pay: 2 екземпляри
+- google_pay: 2 екземпляри
 
 ### транзакції (8 інстансів)
-
-authorization: auth_tx_001, auth_tx_002
-settle: capture_tx_001, capture_tx_002
-refund: refund_tx_001, refund_tx_002
-void: void_tx_001, void_tx_002
+- authorization: 2 екземпляри (успішна та невдала)
+- settle: 2 екземпляри
+- refund: 2 екземпляри (часткове та повне повернення)
+- void: 2 екземпляри
 
 ### учасники (8 інстансів)
+- ecommerce_merchant: 2 екземпляри з різними прийнятими методами оплати
+- retail_merchant: 2 екземпляри
+- individual_customer: 2 екземпляри
+- business_customer: 2 екземпляри
 
-ecommerce_merchant: ecommerce_merchant_001, ecommerce_merchant_002
-retail_merchant: retail_merchant_001, retail_merchant_002
-individual_customer: individual_customer_001, individual_customer_002
-business_customer: business_customer_001, business_customer_002
+## функціональність системи
 
-## запити до бази
-
-### базові предикати
+### базові запити
 
 #### перевірка відношень
+- перевірка прямих та транзитивних зв'язків is_a
+- перевірка композиційних зв'язків part_of
+- визначення типу відношення між об'єктами
 
-% пряме відношення
-?- is_a(visa_card, branded_card).
-true
+#### навігація по ієрархії
+- пошук всіх нащадків класу
+- пошук всіх компонентів об'єкта
+- пошук всіх вимог для операції
 
-% транзитивне відношення
-?- is_a_transitive(visa_card, card).
-true
+#### робота з інстансами
+- пошук екземплярів класу (включаючи підкласи)
+- отримання детальної інформації про екземпляр
+- отримання конкретних властивостей екземпляра
 
-?- is_a_transitive(visa_card, financial_entity).
-true
+#### пошук шляхів
+- знаходження шляху між двома сутностями
+- підтримка пошуку через всі типи відношень
+- запобігання циклам при обході графу
 
-#### пошук нащадків
+### валідаційні правила
 
-% всі типи карток
-?- all_descendants(card, Cards).
-Cards = [branded_card, visa_card, mastercard_card, amex_card]
+#### валідація транзакцій
+- перевірка коректності послідовності транзакцій
+- валідація окремого ланцюжка операцій
+- перевірка можливості виконання операції після іншої
 
-% всі методи оплати
-?- all_descendants(payment_method, Methods).
-Methods = [card, alternative_payment_method, digital_wallet, 
-           branded_card, regional_apm, mobile_wallet, 
-           visa_card, mastercard_card, amex_card, 
-           pix, upi, ideal, apple_pay, google_pay]
+#### валідація параметрів
+- перевірка коректності суми (додатнє число)
+- валідація валюти (підтримка 6 валют)
+- комплексна перевірка транзакції
 
-% всі типи транзакцій
-?- all_descendants(transaction, Types).
-Types = [authorization, settle, refund, void]
+#### валідація платіжних методів
+- перевірка чи merchant приймає payment_method
+- перевірка через ієрархію типів
+- валідація статусу картки
+- перевірка терміну дії картки
+- комплексна перевірка можливості оплати
 
-#### композиція
+#### валідація залежностей
+- перевірка наявності всіх необхідних залежностей
+- пошук відсутніх вимог для операції
 
-% компоненти card_data
-?- all_parts(card_data, Parts).
-Parts = [card_number, bin, cvv, expiration_month, 
-         expiration_year, cardholder_name]
+### агрегаційні запити та статистика
 
-% транзитивна композиція
-?- part_of_transitive(card_number, card).
-true
+#### підрахунок екземплярів
+- кількість інстансів конкретного типу
+- кількість інстансів класу з підкласами
+- загальна кількість класів в онтології
 
-#### залежності
+#### статистика відношень
+- кількість зв'язків кожного типу
+- загальна кількість зв'язків в системі
+- максимальна глибина ієрархії
 
-% що потрібно для authorization
-?- all_requirements(authorization, Reqs).
-Reqs = [card_data, three_ds_secure]
+#### аналіз даних
+- пошук екземплярів за статусом
+- підрахунок активних карток
+- транзакції по валютах
+- сумування транзакцій по валютах
+- пошук merchants за прийнятим методом оплати
 
-% ланцюжок залежностей
-?- requires(refund, X).
-X = settle
-
-?- requires(settle, Y).
-Y = authorization
-
-### робота з інстансами
-
-% всі visa картки
-?- all_instances(visa_card, Instances).
-Instances = [visa_card_4111, visa_card_4532]
-
-% всі картки через ієрархію
-?- all_instances(card, AllCards).
-AllCards = [visa_card_4111, visa_card_4532, 
-            mastercard_5555, mastercard_5105, 
-            amex_3782, amex_3714]
-
-% інформація про інстанс
-?- instance_info(visa_card_4111, Type, Props).
-Type = visa_card,
-Props = [card_number('4111111111111111'), 
-         expiry('12/2025'), 
-         cvv('123')]
-
-% інформація про pix
-?- instance_info(pix_br_001, Type, Props).
-Type = pix,
-Props = [country('Brazil'), currency('BRL'), 
-         pix_key('user@example.com'), status('active')]
-
-### пошук шляхів
-
-% простий шлях
-?- find_path(card, customer, Path).
-Path = [card, customer]
-
-% складний шлях через підписку
-?- find_path(subscription, chargeback, Path).
-Path = [subscription, recurring_payment, order, transaction, chargeback]
-
-% зворотний напрямок
-?- find_path(chargeback, subscription, Path).
-Path = [chargeback, transaction, order, recurring_payment, subscription]
-
-% через вимоги
-?- find_path(refund, authorization, Path).
-Path = [refund, settle, authorization]
-
-% довгий шлях (7 рівнів)
-?- find_path(apple_pay, chargeback, Path).
-Path = [apple_pay, mobile_wallet, digital_wallet, 
-        payment_method, order, transaction, chargeback]
-
-### перевірка зв'язків
-
-% чи зв'язані через будь-яке відношення
-?- connected_transitive(apple_pay, customer).
-true
-
-% тип відношення
-?- relation_type(visa_card, branded_card, Type).
-Type = 'is_a'
-
-?- relation_type(card_number, card_data, Type).
-Type = 'part_of'
-
-
-### відношення processes та belongs_to
-
-% хто обробляє payment
-?- processes(X, payment).
-X = processor
-
-% що обробляє merchant
-?- processes(merchant, X).
-X = order
-
-% кому належить card
-?- belongs_to(card, X).
-X = customer
-
-% що належить customer (множинна відповідь)
-?- belongs_to(X, customer).
-X = card ;
-X = subscription
+#### звіти
+- повна статистика інстансів
+- статистика по класах з ієрархією
+- статистика транзакцій по валютах
+- загальна статистика онтології (все в одному звіті)
 
 ## приклади використання
 
-### use case 1: валідація транзакції
+### use case 1: валідація бізнес-процесу
 
-питання: чи може бути виконаний refund?
+перевірка чи можна виконати повернення коштів:
+1. перевірити чи було списання
+2. перевірити чи було до списання авторизація
+3. тільки тоді можна робити refund
 
-?- requires(refund, X).
-X = settle
+система автоматично валідує весь ланцюжок.
 
-?- requires(settle, Y).
-Y = authorization
+### use case 2: аналіз платіжних можливостей
 
-висновок: для refund потрібен ланцюжок authorization → settle → refund
+для конкретного merchant можна:
+- дізнатись які методи оплати він приймає
+- перевірити чи конкретна картка підходить
+- валідувати статус картки та термін дії
 
-### use case 2: аналіз платіжного методу
+### use case 3: пошук зв'язків
 
-питання: які властивості має pix?
+система може знайти шлях між будь-якими двома сутностями:
+- від subscription до chargeback через 5 проміжних вузлів
+- від apple_pay до customer через відношення належності
+- від refund до authorization через вимоги
 
-?- instance_info(pix_br_001, Type, Props).
-Type = pix,
-Props = [country('Brazil'), currency('BRL'), 
-         pix_key('user@example.com'), status('active')]
+### use case 4: статистичний аналіз
 
-### use case 3: пошук всіх карток клієнта
+можна отримати:
+- скільки транзакцій у кожній валюті
+- яка загальна сума транзакцій по валютах
+- скільки активних карток у системі
+- які merchants приймають конкретний метод оплати
 
-?- all_instances(card, Cards).
-Cards = [visa_card_4111, visa_card_4532, 
-         mastercard_5555, mastercard_5105, 
-         amex_3782, amex_3714]
+### use case 5: перевірка коректності даних
 
-### use case 4: перевірка можливості chargeback
-
-питання: чи може підписка призвести до chargeback?
-
-?- find_path(subscription, chargeback, Path).
-Path = [subscription, recurring_payment, order, transaction, chargeback]
-
-відповідь: так, через ланцюжок з 5 кроків.
-
-### use case 5: аналіз структури картки
-
-?- all_parts(card_data, Parts).
-Parts = [card_number, bin, cvv, expiration_month, 
-         expiration_year, cardholder_name]
+система дозволяє:
+- перевірити чи всі залежності задоволені
+- валідувати бізнес-правила
+- знайти відсутні компоненти
 
 ## запуск
 
@@ -360,88 +277,87 @@ Parts = [card_number, bin, cvv, expiration_month,
 
 ### встановлення
 
-1. встановити swi-prolog з офіційного сайту
+1. встановити swi-prolog з офіційного сайту: https://www.swi-prolog.org/
 2. завантажити файл `ontology.pl`
 
 ### запуск
 
 swipl
-
-у консолі prolog:
-
 ?- ['ontology'].
-true
+true.
 
-### тестові запити
-
-після завантаження можна виконувати запити:
-
-% перевірка базових зв'язків
 ?- is_a_transitive(visa_card, card).
 
 % пошук шляху
 ?- find_path(subscription, chargeback, Path).
 
-% всі методи оплати
-?- all_descendants(payment_method, Methods).
+% валідація
+?- can_perform_transaction(authorization, settle).
 
-% інформація про інстанс
-?- instance_info(visa_card_4111, Type, Props).
+% статистика
+?- ontology_statistics.
 
+% агрегація
+?- count_active_cards(Count).
 
-## статистика онтології
+% пошук
+?- instances_by_status(active, Instances).
+статистика онтології
+метриказначеннязагальна кількість класів35+типів відношень5загальна кількість зв'язків80+максимальна глибина is_a5 рівнівкількість інстансів28практичних класів14підтримуваних валют6
+технічні особливості
+транзитивні замикання
+система підтримує транзитивні запити для:
 
-| метрика                   | значення |
-|---------------------------|----------|
-| загальна кількість класів | 35+      |
-| відношень                 | 5        |
-| максимальна глибина is_a  | 5 рівнів |
-| кількість інстансів       | 28       |
-| практичних класів         | 14       |
+is_a_transitive/2 - ієрархія класів
+part_of_transitive/2 - композиція
+connected_transitive/2 - будь-які зв'язки
 
-## технічні особливості
+це дозволяє знаходити непрямі зв'язки через декілька рівнів автоматично.
+алгоритми пошуку
+використовується depth-first search з:
 
-### транзитивні замикання
+запобіганням циклів через список відвіданих вузлів
+підтримкою всіх типів відношень
+можливістю пошуку у обох напрямках
 
-- `is_a_transitive/2` - для ієрархії класів
-- `part_of_transitive/2` - для композиції
-- `connected_transitive/2` - для всіх зв'язків
+валідаційний движок
+підтримує:
 
-### алгоритм пошуку шляху
+перевірку бізнес-правил
+ланцюжкову валідацію
+перевірку через ієрархію типів
+комплексні перевірки з декількох умов
 
-функція `find_path/3` використовує depth-first search з запобіганням циклів:
+статистичний аналіз
+реалізовано:
 
-find_path(X, Y, Path) :- find_path(X, Y, [X], Path).
+агрегацію по типах
+групування по параметрах
+підрахунок з фільтрацією
+форматований вивід результатів
 
-find_path(X, Y, Visited, Path) :-
-    connected(X, Y),
-    \+ member(Y, Visited),
-    reverse([Y|Visited], Path).
-
-find_path(X, Y, Visited, Path) :-
-    connected(X, Z),
-    \+ member(Z, Visited),
-    find_path(Z, Y, [Z|Visited], Path).
-
-### допоміжні предикати
-
-- `all_descendants/2` - пошук всіх нащадків класу
-- `all_parts/2` - пошук всіх компонентів
-- `all_requirements/2` - пошук всіх вимог
-- `all_instances/2` - пошук всіх інстансів класу
-- `instance_info/3` - отримання інформації про інстанс
-- `relation_type/3` - визначення типу зв'язку
-
-## висновки
-
+розширення системи
+систему легко розширити:
+додавання нових класів
+просто додайте відношення is_a з існуючим класом
+додавання нових інстансів
+використовуйте формат instance/3 з властивостями
+додавання нових валідацій
+створіть нові правила з використанням існуючих предикатів
+додавання нових звітів
+використовуйте findall для збору даних та format для виводу
+висновки
 створена онтологія повністю покриває предметну область платіжних систем та фінтехнологій. система дозволяє:
 
-- автоматично перевіряти зв'язки між об'єктами
-- шукати шляхи між віддаленими вузлами
-- валідувати правила (наприклад, послідовність транзакцій)
-- аналізувати залежності
-- навігувати по складній ієрархії класів
+навігувати по складній ієрархії класів
+валідувати бізнес-правила та послідовності операцій
+аналізувати зв'язки між віддаленими сутностями
+збирати статистику по різних параметрах
+перевіряти коректність даних та операцій
 
-завдяки транзитивним замиканням система може знаходити непрямі зв'язки через декілька рівнів ієрархії, що особливо корисно для аналізу складних сценаріїв у фінтех-системах.
+завдяки транзитивним замиканням та потужним предикатам пошуку система може:
 
-всі вимоги лабораторної роботи виконані з запасом, база знань містить реальні дані та готова до практичного використання.
+знаходити непрямі зв'язки через декілька рівнів
+будувати шляхи між будь-якими сутностями
+автоматично валідувати складні бізнес-сценарії
+генерувати детальні аналітичні звіти
